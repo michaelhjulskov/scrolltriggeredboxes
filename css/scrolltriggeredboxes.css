@@ -27,6 +27,8 @@
 }
 .scroll_triggered_box .close{
 	margin-right: 3px;
+	font-size: 27px;
+	color: darkred;
 }
 .scroll_triggered_box.top-left{
 	top: 0;

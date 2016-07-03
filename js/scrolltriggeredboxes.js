@@ -12,7 +12,13 @@
  * @license   Commercial license
  * Support by mail:  support@azelab.com
  */
-
+// Michael Hjulskov
+/* added these
+first_minutes
+is_logged
+is_cart
+*/
+// END Michael Hjulskov
 $(document).ready(function(){
 	$(window).scroll(function (event) {
 		var pageHeight = $(document).height();
@@ -21,10 +27,22 @@ $(document).ready(function(){
 
 		$('.scroll_triggered_box').each(function(){
 
-			if(getCookie('box' + $(this).data('box-id')) != "true" || $(this).data('test-mode')){
+			if(getMyCookie('box' + $(this).data('box-id')) != "true" || $(this).data('test-mode')){
 				if($(this).data('user_closed') == 'closed') return false;
+				//if($(this).data('first-minutes') && ????sometimestamp+first_minutes<now???? ) return false;
 				var pagePercent = ($(this).data('trigger') / 100) * (pageHeight - windowHeight);
-				if(scrollHeight >= pagePercent){
+				var cartIsEmpty = isCartEmpty();
+				var is_cart = parseInt($(this).data('is-cart'));
+				var is_logged = parseInt($(this).data('is-logged'));
+				if(scrollHeight >= pagePercent && !$(this).is(":visible")){
+					//console.log('visible ' + $('#scrolltriggeredboxes_' + $(this).data('box-id')).is(":visible") + ' ' + $(this).data('box-id')  );
+					if(is_logged == 1 && !isLogged) return false;
+					if(is_logged == 2 && isLogged) return false;
+					//if(is_cart == 1 && !cartIsEmpty) console.log('noget i kurv ' + $(this).data('box-id') + ' is_cart=' + is_cart + ' this=' + this  ); 
+					if(is_cart == 1 && !cartIsEmpty) return false; 
+					//if(is_cart == 2 && cartIsEmpty) console.log('kurv er tom ' + $(this).data('box-id') + ' is_cart=' + is_cart  + ' this=' + this );
+					if(is_cart == 2 && cartIsEmpty) return false;
+					//console.log('vis ' + $(this).data('box-id')  );
 					switch($(this).data('animation')){
 						case 0:
 							$(this).fadeIn('slow');
@@ -36,7 +54,7 @@ $(document).ready(function(){
 							$(this).fadeIn('slow');
 						}
 				}
-				else if($(this).data('auto-hide') && scrollHeight < pagePercent){
+				else if($(this).is(":visible") && (($(this).data('auto-hide') && scrollHeight < pagePercent)||(is_cart == 1 && !cartIsEmpty)||(is_cart == 2 && cartIsEmpty))){
 					switch($(this).data('animation')){
 						case 0:
 							$(this).fadeOut('slow');
@@ -58,7 +76,7 @@ $(document).ready(function(){
 		var box = $(this).closest('.scroll_triggered_box');
 		box.data("user_closed", 'closed');
 		if(box.data('exp-days') > 0)
-			setCookie('box' + box.data('box-id'), true, box.data('exp-days'));
+			setMyCookie('box' + box.data('box-id'), true, box.data('exp-days'));
 
 		switch(box.data('animation')){
 			case 0:
@@ -71,8 +89,22 @@ $(document).ready(function(){
 				box.fadeOut('slow');
 			}
 	});
+});
 
-function setCookie(cname, cvalue, exdays) {
+
+function isCartEmpty() {
+	if ($('#blockcart_top_wrap .ajax_cart_quantity').length == 1){
+		var CartQty = parseInt($('#blockcart_top_wrap .ajax_cart_quantity').html());
+		if (isNaN(CartQty) || CartQty == 0)
+			return true;
+		return false;
+	} else if (page_name == 'order-opc' || page_name == 'order')
+		return false;
+	return true;
+	//return ajaxCart.nb_total_products;
+}
+
+function setMyCookie(cname, cvalue, exdays) {// Michael Hjulskov - i renamed from setCookie to setMyCookie
 	var d = new Date();
 	d.setTime(d.getTime() + (exdays*24*60*60*1000));
 	/*d.setTime(d.getTime() + (exdays*1000));*/
@@ -80,7 +112,7 @@ function setCookie(cname, cvalue, exdays) {
 	document.cookie = cname + "=" + cvalue + "; " + expires;
 }
 
-function getCookie(cname) {
+function getMyCookie(cname) { // Michael Hjulskov - i renamed from getCookie to getMyCookie
 	var name = cname + "=";
 	var ca = document.cookie.split(';');
 	for(var i=0; i<ca.length; i++) {
@@ -90,4 +122,3 @@ function getCookie(cname) {
 	}
 	return "";
 }	
-});

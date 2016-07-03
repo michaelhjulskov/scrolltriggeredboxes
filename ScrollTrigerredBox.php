@@ -32,6 +32,9 @@ class ScrollTrigerredBox extends ObjectModel
 	public $auto_hide;
 	public $test_mode;
 	public $active;
+	public $first_minutes;
+	public $is_logged;
+	public $is_cart;
 
 	/**
 	 * @see ObjectModel::$definition
@@ -46,14 +49,17 @@ class ScrollTrigerredBox extends ObjectModel
 			'border_color' =>	array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml', 'size' => 7),
 			'border_width' =>	array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
 			'box_width' =>		array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
-			'page' =>			array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml', 'size' => 128),
+			'page' =>			array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml', 'size' => 255),
 			'position' =>		array('type' => self::TYPE_STRING, 'validate' => 'isCleanHtml', 'required' => true, 'size' => 20),
 			'trigger' =>		array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true),
 			'animation' =>		array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt'),
 			'exp_days' =>		array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true),
-			'auto_hide' =>			array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'required' => true),
-			'test_mode' =>			array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'required' => true),
+			'auto_hide' =>		array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'required' => true),
+			'test_mode' =>		array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'required' => true),
 			'active' =>			array('type' => self::TYPE_BOOL, 'validate' => 'isBool', 'required' => true),
+			'first_minutes' =>	array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true),
+			'is_logged' =>		array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true),
+			'is_cart' =>		array('type' => self::TYPE_INT, 'validate' => 'isUnsignedInt', 'required' => true),
 
 			/*Lang fields*/
 			'box_name' =>		array('type' => self::TYPE_STRING, 'lang' => true, 'validate' => 'isGenericName', 'required' => true, 'size' => 255),

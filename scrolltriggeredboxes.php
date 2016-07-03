@@ -56,11 +56,14 @@ class ScrollTriggeredBoxes extends Module
 			`border_color` VARCHAR( 7 ) NOT NULL,
 			`border_width` INT(11) UNSIGNED NOT NULL,
 			`box_width` INT(11) UNSIGNED NOT NULL,
-			`page` VARCHAR( 128 ) NOT NULL,
+			`page` VARCHAR(255) NOT NULL,
 			`position` VARCHAR( 20 ) NOT NULL,
 			`trigger` INT(11) UNSIGNED NOT NULL,
 			`animation` INT(11) UNSIGNED NOT NULL,
 			`exp_days` INT(11) UNSIGNED NOT NULL,
+			`first_minutes` INT(11) UNSIGNED NOT NULL DEFAULT \'0\',
+			`is_logged` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
+			`is_cart` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
 			`auto_hide` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
 			`test_mode` tinyint(1) unsigned NOT NULL DEFAULT \'0\',
 			`active` tinyint(1) unsigned NOT NULL DEFAULT \'0\'
@@ -170,6 +173,15 @@ class ScrollTriggeredBoxes extends Module
 			if ((int)Tools::getValue('trigger') < 0 || (int)Tools::getValue('trigger') > 100)
 				$errors[] = $this->l('Trigger has to be > 0 and < 100.');
 
+			if (Tools::getValue('first_minutes') && !Validate::isInt(Tools::getValue('first_minutes')))
+				$errors[] = $this->l('First minutes has to be an integer from 0 and up.');
+			
+			if (!Validate::isInt(Tools::getValue('is_logged')) || (Tools::getValue('is_logged') != 0 && Tools::getValue('is_logged') != 1 && Tools::getValue('is_logged') != 2))
+				$errors[] = $this->l('Invalid is_logged state.');
+				
+			if (!Validate::isInt(Tools::getValue('is_cart')) || (Tools::getValue('is_cart') != 0 && Tools::getValue('is_cart') != 1 && Tools::getValue('is_cart') != 2))
+				$errors[] = $this->l('Invalid is_cart state.');
+
 		} /* Validation for deletion */
 		elseif (Tools::isSubmit('delete_id_box') && (!Validate::isInt(Tools::getValue('delete_id_box')) || !$this->boxExists((int)Tools::getValue('delete_id_box'))))
 			$errors[] = $this->l('Invalid Box ID');
@@ -236,6 +248,9 @@ class ScrollTriggeredBoxes extends Module
 			$box->auto_hide = (int)Tools::getValue('auto_hide');
 			$box->test_mode = (int)Tools::getValue('test_mode');
 			$box->active = (int)Tools::getValue('active');
+			$box->first_minutes = (int)Tools::getValue('first_minutes');
+			$box->is_logged = (int)Tools::getValue('is_logged');
+			$box->is_cart = (int)Tools::getValue('is_cart');
 
 			/* Sets each langue fields */
 			$languages = Language::getLanguages(false);
@@ -403,6 +418,24 @@ class ScrollTriggeredBoxes extends Module
 				'id_option' => 'sitemap',
 				'name' => 'Sitemap Page'
 			),
+			// Michael Hjulskov
+			array(
+				'id_option' => 'module-stblog-category',
+				'name' => 'stblog category'
+			),
+			array(
+				'id_option' => 'manufacturer',
+				'name' => 'Manufacturer Pages'
+			),
+			array(
+				'id_option' => 'module-stblog-article',
+				'name' => 'stblog article'
+			),
+			array(
+				'id_option' => 'advancedsearch-seo',
+				'name' => 'Advanced Seo Search 4 (landingpages)'
+			),
+			// END Michael Hjulskov
 		);
 
 		$position_options = array(
@@ -576,6 +609,61 @@ class ScrollTriggeredBoxes extends Module
 							)
 						),
 					),
+					// Michael Hjulskov
+					array(
+						'type' => 'radio',
+						'label' => $this->l('Only show if visitor'),
+						'desc' => $this->l('Use this option if You would like this box only to appear if visitor is logged in or out.'),
+						'name' => 'is_logged',
+						'values' => array(
+							array(
+								'id' => 'is_logged_off',
+								'value' => 0,
+								'label' => $this->l('Disabled')
+							),
+							array(
+								'id' => 'is_logged_in',
+								'value' => 1,
+								'label' => $this->l('is logged in')
+							),
+							array(
+								'id' => 'is_logged_out',
+								'value' => 2,
+								'label' => $this->l('is logged out')
+							)
+						),
+					),
+					array(
+						'type' => 'radio',
+						'label' => $this->l('Only show if cart'),
+						'desc' => $this->l('Use this option if You would like this box only to appear if visitor is logged in or out.'),
+						'name' => 'is_cart',
+						'values' => array(
+							array(
+								'id' => 'is_cart_off',
+								'value' => 0,
+								'label' => $this->l('Disabled')
+							),
+							array(
+								'id' => 'is_cart_empty',
+								'value' => 1,
+								'label' => $this->l('is empty')
+							),
+							array(
+								'id' => 'is_cart_not_empty',
+								'value' => 2,
+								'label' => $this->l('is not empty')
+							)
+						),
+					),
+					array(
+						'col' => 3,
+						'type' => 'text',
+						'label' => $this->l('Only shown within the very first X minutes of the very first visit'),
+						'desc' => $this->l('This box will only be shown within the very first X minutes of the very first visit/session. If its a returning visitor, it is not shown (method: we look for any cookies) Set to "0" to disable.'),
+						'name' => 'first_minutes',
+					),
+					// END Michael Hjulskov
 					array(
 						'type' => 'switch',
 						'label' => $this->l('Enabled'),
@@ -656,6 +744,9 @@ class ScrollTriggeredBoxes extends Module
 			$fields['auto_hide'] = Tools::getValue('auto_hide', $box->auto_hide);
 			$fields['test_mode'] = Tools::getValue('test_mode', $box->test_mode);
 			$fields['active'] = Tools::getValue('active', $box->active);
+			$fields['first_minutes'] = Tools::getValue('first_minutes', $box->first_minutes);
+			$fields['is_logged'] = Tools::getValue('is_logged', $box->is_logged);
+			$fields['is_cart'] = Tools::getValue('is_cart', $box->is_cart);
 		}
 		else
 		{
@@ -674,6 +765,9 @@ class ScrollTriggeredBoxes extends Module
 			$fields['auto_hide'] = Tools::getValue('auto_hide', 1);
 			$fields['test_mode'] = Tools::getValue('test_mode', 0);
 			$fields['active'] = Tools::getValue('active',0);
+			$fields['first_minutes'] = Tools::getValue('first_minutes',0);
+			$fields['is_logged'] = Tools::getValue('is_logged', 0);
+			$fields['is_cart'] = Tools::getValue('is_cart', 0);
 		}
 
 		$languages = Language::getLanguages(false);
