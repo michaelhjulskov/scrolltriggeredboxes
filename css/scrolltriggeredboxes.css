@@ -1,0 +1,56 @@
+/**
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to a commercial license from AZELAB
+ * Use, copy, modification or distribution of this source file without written
+ * license agreement from the AZELAB is strictly forbidden.
+ * In order to obtain a license, please contact us: support@azelab.com
+ *
+ * @package   Tabbed Featured Categories Subcategories on Home
+ * @copyright Copyright (c) 2014 AZELAB (http://www.azelab.com)
+ * @author    AZELAB
+ * @license   Commercial license
+ * Support by mail:  support@azelab.com
+ */
+
+.scroll_triggered_box{
+	position: fixed;
+	z-index: 9999999;
+	margin: 20px;
+	padding: 5px;
+	background: #FFFFFF;
+	color: #000000;
+	border: 1px solid #CCCCCC;
+	box-shadow: 3px 3px 3px #333;
+	width: 300px;
+	display: none;
+}
+.scroll_triggered_box .close{
+	margin-right: 3px;
+}
+.scroll_triggered_box.top-left{
+	top: 0;
+	left: 0;
+}
+.scroll_triggered_box.top-center{
+	top: 0;
+	left: 50%;
+	margin-left: -150px;
+}
+.scroll_triggered_box.top-right{
+	top: 0;
+	right: 0;
+}
+.scroll_triggered_box.bottom-left{
+	bottom: 0;
+	left: 0;
+}
+.scroll_triggered_box.bottom-center{
+	bottom: 0;
+	left: 50%;
+	margin-left: -150px;
+}
+.scroll_triggered_box.bottom-right{
+	bottom: 0;
+	right: 0;
+}
